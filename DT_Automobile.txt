@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 
 # Load data
 df = pd.read_csv("Automobile.csv")
-df = df.dropna(axis=0)  # Remove rows with missing values
+df = df.dropna(axis=0) 
 
 # Encode categorical columns
 label_encoders = {}
