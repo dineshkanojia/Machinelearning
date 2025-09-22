@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 
 # Load data
 df = pd.read_csv("Automobile.csv")
-df = df.dropna(axis=0) 
+df = df.dropna(axis=0) # Remove rows with missing values
 
 # Encode categorical columns
 label_encoders = {}
@@ -48,3 +48,4 @@ importances = pd.Series(dt.feature_importances_, index=X.columns).sort_values(as
 importances.head(10).plot(kind="bar", figsize=(10,4), title=f"Top 10 Feature Importances ({target_col})")
 plt.tight_layout()
 plt.show()
+
