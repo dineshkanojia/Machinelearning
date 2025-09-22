@@ -1,0 +1,50 @@
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import accuracy_score, classification_report
+import matplotlib.pyplot as plt
+
+# Load data
+df = pd.read_csv("Automobile.csv")
+df = df.dropna(axis=0)  # Remove rows with missing values
+
+# Encode categorical columns
+label_encoders = {}
+for col in df.select_dtypes(include=["object"]).columns:
+    le = LabelEncoder()
+    df[col] = le.fit_transform(df[col])
+    label_encoders[col] = le
+
+# Choose your target column (change as needed)
+target_col = "make"   # or 'fuel-type', 'body-style', etc.
+X = df.drop(target_col, axis=1)
+y = df[target_col]
+
+# Remove rare classes in target (only 1 member)
+vc = y.value_counts()
+rare_classes = vc[vc == 1].index
+if len(rare_classes) > 0:
+    X = X[~y.isin(rare_classes)]
+    y = y[~y.isin(rare_classes)]
+
+# Train-test split
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.3, random_state=42, stratify=y
+)
+
+# Train Decision Tree
+dt = DecisionTreeClassifier(max_depth=6, random_state=42)
+dt.fit(X_train, y_train)
+y_pred = dt.predict(X_test)
+
+# Evaluate
+acc = accuracy_score(y_test, y_pred)
+print(f"Decision Tree Accuracy (predicting '{target_col}'): {acc:.4f}\n")
+print("Classification Report:\n", classification_report(y_test, y_pred))
+
+# Feature Importance Plot
+importances = pd.Series(dt.feature_importances_, index=X.columns).sort_values(ascending=False)
+importances.head(10).plot(kind="bar", figsize=(10,4), title=f"Top 10 Feature Importances ({target_col})")
+plt.tight_layout()
+plt.show()
